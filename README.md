@@ -1,38 +1,85 @@
-# Вычислитель отличий (PHP)
+# gendiff — вычислитель отличий
 
-[![hexlet-check](https://github.com/kicha3007-boop/php-project-48/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/kicha3007-boop/php-project-48/actions)
+[![hexlet-check](https://github.com/kicha3007-boop/php-project-48/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/kicha3007-boop/php-project-48/actions/workflows/hexlet-check.yml)
+[![PHP CI](https://github.com/kicha3007-boop/php-project-48/actions/workflows/workflow.yml/badge.svg)](https://github.com/kicha3007-boop/php-project-48/actions/workflows/workflow.yml)
 
-В этом проекте отрабатывается работа с коллекциями. Изучаются способы построения и обхода деревьев. Вы познакомитесь с разными форматами данных (json, yml), научитесь их парсить и формировать. Начнете писать тесты (PHPUnit) и освоите разработку через них. Познакомитесь с непрерывной интеграцией (CI) и элементами экстремального программирования (XP). Прокачаете ООП мышление.
+Утилита и библиотека, которая сравнивает два конфигурационных файла и показывает разницу между ними.
 
-Учебный проект Хекслета: https://ru.hexlet.io/programs/php
-Как это должно работать: https://asciinema.org/a/Pe6QypnLEmFWssNAjCOJN1iii
+- Входные форматы: JSON, YAML (`.yml`, `.yaml`)
+- Форматы вывода: `stylish` (по умолчанию), `plain`, `json`
 
-## Стек
+## Требования
 
-- PHP
+- PHP 8.3+ (для покрытия — Xdebug)
+- Composer
 
 ## Установка
-
-<!-- Опишите установку: клонирование, зависимости, переменные окружения -->
 
 ```bash
 git clone https://github.com/kicha3007-boop/php-project-48.git
 cd php-project-48
+make install
 ```
 
 ## Использование
 
-<!-- Добавьте примеры запуска и запись asciinema — именно это смотрит работодатель -->
+```text
+$ bin/gendiff -h
+Generate diff
 
----
+Usage:
+  gendiff (-h|--help)
+  gendiff (-v|--version)
+  gendiff [--format <fmt>] <firstFile> <secondFile>
 
-<details>
-<summary>Автоматические тесты Хекслета</summary>
+Options:
+  -h --help                     Show this screen
+  -v --version                  Show version
+  --format <fmt>                Report format [default: stylish]
+```
 
-Тесты запускаются на каждый коммит. За запуск отвечает файл `.github/workflows/hexlet-check.yml` — не удаляйте и не переименовывайте ни его, ни репозиторий.
+### stylish
 
-</details>
+```text
+$ bin/gendiff tests/fixtures/file1.json tests/fixtures/file2.json
+{
+    common: {
+      + follow: false
+        setting1: Value 1
+      - setting2: 200
+      - setting3: true
+      + setting3: null
+  ...
+```
 
-## О Хекслете
+### plain
 
-[Хекслет](https://ru.hexlet.io/) — школа программирования: авторские программы обучения с практикой, поддержкой наставников и реальными проектами, которые остаются в резюме. Этот репозиторий — один из таких проектов.
+```text
+$ bin/gendiff --format plain tests/fixtures/file1.yml tests/fixtures/file2.yaml
+Property 'common.follow' was added with value: false
+Property 'common.setting2' was removed
+Property 'common.setting3' was updated. From true to null
+...
+```
+
+### json
+
+```bash
+bin/gendiff --format json tests/fixtures/file1.json tests/fixtures/file2.json
+```
+
+### Как библиотека
+
+```php
+use function Differ\Differ\genDiff;
+
+$diff = genDiff($pathToFile1, $pathToFile2, 'plain');
+```
+
+## Разработка
+
+```bash
+make lint            # PHP_CodeSniffer, PSR-12
+make test            # PHPUnit
+make test-coverage   # покрытие с порогом COVERAGE_MIN из Makefile
+```
